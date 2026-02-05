@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0"><i class="bi bi-info-circle me-2"></i>About This Dashboard</h2>
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title text-primary">Personal Productivity Dashboard</h4>
+                    <p class="card-text">A modern, feature-rich dashboard designed to help you stay organized and productive.</p>
+                    <hr>
+                    <h5 class="text-secondary mt-4"><i class="bi bi-stars me-2"></i>Key Features</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><i class="bi bi-check-circle-fill text-success me-2"></i>To-Do List with progress tracking</li>
+                        <li class="list-group-item"><i class="bi bi-check-circle-fill text-success me-2"></i>Interactive Calendar for events</li>
+                        <li class="list-group-item"><i class="bi bi-check-circle-fill text-success me-2"></i>Pomodoro Timer for focused work sessions</li>
+                        <li class="list-group-item"><i class="bi bi-check-circle-fill text-success me-2"></i>Notes & Journal for ideas</li>
+                        <li class="list-group-item"><i class="bi bi-check-circle-fill text-success me-2"></i>Weather widget for your location</li>
+                        <li class="list-group-item"><i class="bi bi-check-circle-fill text-success me-2"></i>Productivity statistics & charts</li>
+                        <li class="list-group-item"><i class="bi bi-download-fill text-primary me-2"></i><strong>CSV Export</strong> - Export Tasks, Notes, and Calendar events to CSV files</li>
+                        <li class="list-group-item"><i class="bi bi-file-earmark-fill text-info me-2"></i><strong>About Page</strong> - View project information and team details</li>
+                    </ul>
+                    <hr>
+                    <h5 class="text-secondary mt-4"><i class="bi bi-code-square me-2"></i>Technology Stack</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="card border-primary mb-2">
+                                <div class="card-body">
+                                    <h6 class="card-title">Backend</h6>
+                                    <p class="card-text mb-0">Python Flask</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-info mb-2">
+                                <div class="card-body">
+                                    <h6 class="card-title">Database</h6>
+                                    <p class="card-text mb-0">SQLite (Flask-SQLAlchemy)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-success mb-2">
+                                <div class="card-body">
+                                    <h6 class="card-title">Frontend</h6>
+                                    <p class="card-text mb-0">Bootstrap 5.3</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-warning mb-2">
+                                <div class="card-body">
+                                    <h6 class="card-title">Charts</h6>
+                                    <p class="card-text mb-0">Chart.js</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <h5 class="text-secondary mt-4"><i class="bi bi-people me-2"></i>Team</h5>
+                    <p class="card-text">This project was developed as a collaborative effort between team members. Each contributor has brought unique features and improvements to make this dashboard better.</p>
+                    <div class="alert alert-info mt-4">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        <strong>Version:</strong> 1.0.0 | <strong>Last Updated:</strong> February 2026
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
