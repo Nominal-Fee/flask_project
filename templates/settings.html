@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="h3 mb-1"><i class="bi bi-gear me-2"></i>Settings</h1>
+            <p class="text-muted mb-0">Customize your dashboard experience</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- User Settings -->
+    <div class="col-lg-6">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <span><i class="bi bi-person"></i>User Profile</span>
+            </div>
+            <div class="card-body">
+                <div class="settings-section">
+                    <div class="mb-3">
+                        <label class="form-label">Display Name</label>
+                        <input type="text" class="form-control" id="userName" placeholder="Enter your name">
+                        <small class="text-muted">This name will appear in greetings</small>
+                    </div>
+                    <button class="btn btn-gradient" onclick="saveUserSettings()">
+                        <i class="bi bi-check-lg me-1"></i>Save Name
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Settings -->
+    <div class="col-lg-6">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <span><i class="bi bi-palette"></i>Appearance</span>
+            </div>
+            <div class="card-body">
+                <div class="settings-section">
+                    <h6 class="mb-3">Theme</h6>
+                    <div class="d-flex gap-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="theme" id="themeLight" value="light">
+                            <label class="form-check-label" for="themeLight">
+                                <i class="bi bi-sun me-1"></i>Light
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="theme" id="themeDark" value="dark">
+                            <label class="form-check-label" for="themeDark">
+                                <i class="bi bi-moon me-1"></i>Dark
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="theme" id="themeAuto" value="auto">
+                            <label class="form-check-label" for="themeAuto">
+                                <i class="bi bi-circle-half me-1"></i>Auto
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Widgets -->
+    <div class="col-lg-6">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <span><i class="bi bi-grid"></i>Dashboard Widgets</span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">Choose which widgets appear on your dashboard</p>
+                
+                <div class="widget-toggle">
+                    <label for="widget-weather">
+                        <i class="bi bi-cloud-sun text-primary"></i>
+                        Weather
+                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="widget-weather" checked>
+                    </div>
+                </div>
+                
+                <div class="widget-toggle">
+                    <label for="widget-quote">
+                        <i class="bi bi-quote text-danger"></i>
+                        Daily Quote
+                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="widget-quote" checked>
+                    </div>
+                </div>
+                
+                <div class="widget-toggle">
+                    <label for="widget-chart">
+                        <i class="bi bi-graph-up text-success"></i>
+                        Productivity Chart
+                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="widget-chart" checked>
+                    </div>
+                </div>
+                
+                <div class="widget-toggle">
+                    <label for="widget-todos">
+                        <i class="bi bi-check2-square text-info"></i>
+                        To-Do List
+                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="widget-todos" checked>
+                    </div>
+                </div>
+                
+                <div class="widget-toggle">
+                    <label for="widget-schedule">
+                        <i class="bi bi-calendar-event text-warning"></i>
+                        Schedule
+                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="widget-schedule" checked>
+                    </div>
+                </div>
+                
+                <div class="widget-toggle">
+                    <label for="widget-notes">
+                        <i class="bi bi-sticky text-secondary"></i>
+                        Notes Preview
+                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="widget-notes" checked>
+                    </div>
+                </div>
+                
+                <div class="widget-toggle">
+                    <label for="widget-quick-links">
+                        <i class="bi bi-lightning text-primary"></i>
+                        Quick Actions
+                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="widget-quick-links" checked>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Management -->
+    <div class="col-lg-6">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <span><i class="bi bi-database"></i>Data Management</span>
+            </div>
+            <div class="card-body">
+                <div class="settings-section">
+                    <h6 class="mb-3">Export Data</h6>
+                    <p class="text-muted small">Download all your data as JSON</p>
+                    <button class="btn btn-outline-primary mb-3" onclick="exportData()">
+                        <i class="bi bi-download me-1"></i>Export All Data
+                    </button>
+                </div>
+                
+                <hr>
+                
+                <div class="settings-section">
+                    <h6 class="mb-3 text-danger">Danger Zone</h6>
+                    <p class="text-muted small">These actions cannot be undone</p>
+                    <button class="btn btn-outline-danger" onclick="clearAllData()">
+                        <i class="bi bi-trash me-1"></i>Clear All Local Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About -->
+    <div class="col-12">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <span><i class="bi bi-info-circle"></i>About</span>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5>Personal Dashboard</h5>
+                        <p class="text-muted mb-2">A self-contained Flask dashboard for productivity and organization.</p>
+                        <p class="text-muted small mb-0">
+                            <strong>Version:</strong> 2.0.0 |
+                            <strong>Built with:</strong> Flask, Bootstrap 5, Chart.js, SQLite |
+                            <strong>No external APIs required</strong>
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <span class="badge bg-gradient-primary fs-6 p-2">
+                            <i class="bi bi-speedometer2 me-1"></i>
+                            Flask Dashboard
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Load settings on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load username
+        const savedName = localStorage.getItem('userName') || '';
+        document.getElementById('userName').value = savedName;
+        
+        // Load theme setting
+        const savedTheme = localStorage.getItem('themePreference') || 'light';
+        document.getElementById(`theme${savedTheme.charAt(0).toUpperCase() + savedTheme.slice(1)}`).checked = true;
+        
+        // Load widget settings
+        const widgets = ['weather', 'quote', 'chart', 'todos', 'schedule', 'notes', 'quick-links'];
+        widgets.forEach(widget => {
+            const checkbox = document.getElementById(`widget-${widget}`);
+            const saved = localStorage.getItem(`widget-${widget}`);
+            checkbox.checked = saved !== 'false'; // Default to true
+        });
+    });
+
+    // Save username
+    function saveUserSettings() {
+        const name = document.getElementById('userName').value.trim();
+        localStorage.setItem('userName', name);
+        
+        // Update sidebar
+        document.getElementById('userName').textContent = name || 'User';
+        
+        alert('Settings saved successfully!');
+    }
+
+    // Theme radio change
+    document.querySelectorAll('input[name="theme"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const theme = this.value;
+            localStorage.setItem('themePreference', theme);
+            
+            if (theme === 'auto') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-bs-theme', prefersDark ? 'dark' : 'light');
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+            }
+            localStorage.setItem('theme', document.documentElement.getAttribute('data-bs-theme'));
+        });
+    });
+
+    // Widget toggle change
+    document.querySelectorAll('.widget-toggle input').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const widgetId = this.id;
+            localStorage.setItem(widgetId, this.checked);
+        });
+    });
+
+    // Export data
+    async function exportData() {
+        try {
+            const [todos, notes, events] = await Promise.all([
+                fetch('/api/todos').then(r => r.json()),
+                fetch('/api/notes').then(r => r.json()),
+                fetch('/api/events').then(r => r.json())
+            ]);
+            
+            const data = {
+                exportDate: new Date().toISOString(),
+                todos,
+                notes,
+                events,
+                settings: {
+                    userName: localStorage.getItem('userName'),
+                    theme: localStorage.getItem('theme'),
+                    widgets: {}
+                }
+            };
+            
+            // Add widget settings
+            const widgets = ['weather', 'quote', 'chart', 'todos', 'schedule', 'notes', 'quick-links'];
+            widgets.forEach(widget => {
+                data.settings.widgets[widget] = localStorage.getItem(`widget-${widget}`) !== 'false';
+            });
+            
+            // Download file
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dashboard-export-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+        } catch (error) {
+            console.error('Error exporting data:', error);
+            alert('Error exporting data. Please try again.');
+        }
+    }
+
+    // Clear all local settings
+    function clearAllData() {
+        if (!confirm('Are you sure you want to clear all local settings? This will reset your theme, username, and widget preferences.')) {
+            return;
+        }
+        
+        localStorage.clear();
+        alert('Local settings cleared. Refreshing page...');
+        location.reload();
+    }
+</script>
+{% endblock %}

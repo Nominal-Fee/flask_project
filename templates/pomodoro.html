@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block title %}Pomodoro Timer{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header mb-4 text-center">
+    <h1 class="h3 mb-1"><i class="bi bi-stopwatch me-2"></i>Pomodoro Timer</h1>
+    <p class="text-muted mb-0">Stay focused and productive</p>
+</div>
+
+<div class="pomodoro-container">
+    <!-- Timer Circle -->
+    <div class="timer-circle" id="timerCircle">
+        <div class="timer-display" id="timerDisplay">25:00</div>
+        <div class="timer-label" id="timerLabel">Focus Time</div>
+    </div>
+
+    <!-- Timer Controls -->
+    <div class="timer-controls mb-4">
+        <button class="btn btn-gradient timer-btn" id="startBtn" onclick="startTimer()">
+            <i class="bi bi-play-fill me-1"></i>Start
+        </button>
+        <button class="btn btn-outline-secondary timer-btn" id="pauseBtn" onclick="pauseTimer()" style="display: none;">
+            <i class="bi bi-pause-fill me-1"></i>Pause
+        </button>
+        <button class="btn btn-outline-danger timer-btn" id="resetBtn" onclick="resetTimer()">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+        </button>
+    </div>
+
+    <!-- Timer Settings -->
+    <div class="card dashboard-card mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-4 text-center">
+                    <label class="form-label small mb-1">Focus</label>
+                    <select class="form-select" id="focusDuration" onchange="updateDuration()">
+                        <option value="15">15 min</option>
+                        <option value="25" selected>25 min</option>
+                        <option value="30">30 min</option>
+                        <option value="45">45 min</option>
+                        <option value="60">60 min</option>
+                    </select>
+                </div>
+                <div class="col-4 text-center">
+                    <label class="form-label small mb-1">Short Break</label>
+                    <select class="form-select" id="shortBreakDuration">
+                        <option value="3">3 min</option>
+                        <option value="5" selected>5 min</option>
+                        <option value="10">10 min</option>
+                    </select>
+                </div>
+                <div class="col-4 text-center">
+                    <label class="form-label small mb-1">Long Break</label>
+                    <select class="form-select" id="longBreakDuration">
+                        <option value="15" selected>15 min</option>
+                        <option value="20">20 min</option>
+                        <option value="30">30 min</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Type Buttons -->
+    <div class="d-flex justify-content-center gap-2 mb-4 flex-wrap">
+        <button class="btn btn-outline-primary active" id="focusBtn" onclick="setMode('focus')">
+            <i class="bi bi-bullseye me-1"></i>Focus
+        </button>
+        <button class="btn btn-outline-success" id="shortBreakBtn" onclick="setMode('shortBreak')">
+            <i class="bi bi-cup-hot me-1"></i>Short Break
+        </button>
+        <button class="btn btn-outline-info" id="longBreakBtn" onclick="setMode('longBreak')">
+            <i class="bi bi-moon me-1"></i>Long Break
+        </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="pomodoro-stats">
+        <div class="pomodoro-stat">
+            <div class="stat-value" id="todaySessions">{{ today_sessions }}</div>
+            <div class="stat-label">Today's Sessions</div>
+        </div>
+        <div class="pomodoro-stat">
+            <div class="stat-value" id="totalSessions">{{ total_sessions }}</div>
+            <div class="stat-label">Total Sessions</div>
+        </div>
+        <div class="pomodoro-stat">
+            <div class="stat-value" id="totalHours">{{ total_hours }}</div>
+            <div class="stat-label">Total Hours</div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden audio elements -->
+<audio id="workCompleteSound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleQ0YmuvF8b6C" type="audio/wav">
+</audio>
+<audio id="breakCompleteSound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleQ0YmuvF8b6C" type="audio/wav">
+</audio>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Timer state
+    let timeRemaining = 25 * 60; // seconds
+    let timerInterval = null;
+    let isRunning = false;
+    let currentMode = 'focus'; // 'focus', 'shortBreak', 'longBreak'
+    let sessionsCompleted = {{ today_sessions }};
+
+    // Sound effects (using Web Audio API for better compatibility)
+    function playNotificationSound() {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = currentMode === 'focus' ? 800 : 600;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+            
+            // Play three beeps
+            setTimeout(() => {
+                const osc2 = audioContext.createOscillator();
+                const gain2 = audioContext.createGain();
+                osc2.connect(gain2);
+                gain2.connect(audioContext.destination);
+                osc2.frequency.value = currentMode === 'focus' ? 800 : 600;
+                gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                osc2.start();
+                osc2.stop(audioContext.currentTime + 0.5);
+            }, 200);
+            
+            setTimeout(() => {
+                const osc3 = audioContext.createOscillator();
+                const gain3 = audioContext.createGain();
+                osc3.connect(gain3);
+                gain3.connect(audioContext.destination);
+                osc3.frequency.value = currentMode === 'focus' ? 1000 : 800;
+                gain3.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gain3.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+                osc3.start();
+                osc3.stop(audioContext.currentTime + 0.8);
+            }, 400);
+        } catch (e) {
+            console.log('Audio not supported');
+        }
+    }
+
+    function updateDisplay() {
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        document.getElementById('timerDisplay').textContent = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        // Update page title
+        document.title = `${minutes}:${seconds.toString().padStart(2, '0')} - Pomodoro`;
+    }
+
+    function updateDuration() {
+        if (!isRunning) {
+            const duration = parseInt(document.getElementById('focusDuration').value);
+            timeRemaining = duration * 60;
+            updateDisplay();
+        }
+    }
+
+    function setMode(mode) {
+        if (isRunning) {
+            if (!confirm('Timer is running. Switch mode anyway?')) return;
+            pauseTimer();
+        }
+        
+        currentMode = mode;
+        const timerCircle = document.getElementById('timerCircle');
+        
+        // Update active button
+        document.querySelectorAll('.d-flex.justify-content-center .btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        switch(mode) {
+            case 'focus':
+                timeRemaining = parseInt(document.getElementById('focusDuration').value) * 60;
+                document.getElementById('timerLabel').textContent = 'Focus Time';
+                timerCircle.classList.remove('break');
+                document.getElementById('focusBtn').classList.add('active');
+                break;
+            case 'shortBreak':
+                timeRemaining = parseInt(document.getElementById('shortBreakDuration').value) * 60;
+                document.getElementById('timerLabel').textContent = 'Short Break';
+                timerCircle.classList.add('break');
+                document.getElementById('shortBreakBtn').classList.add('active');
+                break;
+            case 'longBreak':
+                timeRemaining = parseInt(document.getElementById('longBreakDuration').value) * 60;
+                document.getElementById('timerLabel').textContent = 'Long Break';
+                timerCircle.classList.add('break');
+                document.getElementById('longBreakBtn').classList.add('active');
+                break;
+        }
+        
+        updateDisplay();
+    }
+
+    function startTimer() {
+        if (isRunning) return;
+        
+        isRunning = true;
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('pauseBtn').style.display = 'inline-block';
+        document.getElementById('timerCircle').classList.add('running');
+        
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            updateDisplay();
+            
+            if (timeRemaining <= 0) {
+                timerComplete();
+            }
+        }, 1000);
+    }
+
+    function pauseTimer() {
+        isRunning = false;
+        clearInterval(timerInterval);
+        document.getElementById('startBtn').style.display = 'inline-block';
+        document.getElementById('pauseBtn').style.display = 'none';
+        document.getElementById('timerCircle').classList.remove('running');
+        document.getElementById('timerCircle').classList.add('paused');
+    }
+
+    function resetTimer() {
+        pauseTimer();
+        document.getElementById('timerCircle').classList.remove('paused');
+        setMode(currentMode);
+    }
+
+    async function timerComplete() {
+        pauseTimer();
+        playNotificationSound();
+        
+        if (currentMode === 'focus') {
+            // Record completed session
+            try {
+                const duration = parseInt(document.getElementById('focusDuration').value);
+                await fetch('/api/pomodoro/complete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ duration })
+                });
+                
+                // Update stats
+                sessionsCompleted++;
+                document.getElementById('todaySessions').textContent = sessionsCompleted;
+                const totalSessions = parseInt(document.getElementById('totalSessions').textContent) + 1;
+                document.getElementById('totalSessions').textContent = totalSessions;
+            } catch (error) {
+                console.error('Error recording session:', error);
+            }
+            
+            // Show notification
+            if (Notification.permission === 'granted') {
+                new Notification('Pomodoro Complete! 🍅', {
+                    body: 'Great work! Time for a break.',
+                    icon: '🍅'
+                });
+            }
+            
+            // Suggest break
+            if (sessionsCompleted % 4 === 0) {
+                alert('🎉 Great job! You completed 4 pomodoros. Time for a long break!');
+                setMode('longBreak');
+            } else {
+                alert('✅ Focus session complete! Take a short break.');
+                setMode('shortBreak');
+            }
+        } else {
+            // Break complete
+            if (Notification.permission === 'granted') {
+                new Notification('Break Over! ⏰', {
+                    body: 'Ready to focus again?',
+                    icon: '⏰'
+                });
+            }
+            alert('☕ Break over! Ready to focus again?');
+            setMode('focus');
+        }
+    }
+
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+
+    // Initialize
+    updateDisplay();
+
+    // Prevent accidental page close during timer
+    window.addEventListener('beforeunload', function(e) {
+        if (isRunning) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (e.code === 'Space' && !e.target.matches('input, textarea, select')) {
+            e.preventDefault();
+            if (isRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        }
+    });
+</script>
+{% endblock %}

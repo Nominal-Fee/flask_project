@@ -1,0 +1,984 @@
+/* ============================================
+   Personal Dashboard - Main Stylesheet
+   ============================================ */
+
+:root {
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 0px;
+    --card-border-radius: 16px;
+    --transition-speed: 0.3s;
+    --gradient-start: #667eea;
+    --gradient-end: #764ba2;
+}
+
+/* ============================================
+   Theme Variables
+   ============================================ */
+
+[data-bs-theme="light"] {
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --card-hover-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    --sidebar-bg: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    --main-bg: #f8f9fa;
+}
+
+[data-bs-theme="dark"] {
+    --gradient-start: #4c6ef5;
+    --gradient-end: #7950f2;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --card-hover-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    --sidebar-bg: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    --main-bg: #121212;
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--main-bg);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================
+   Mobile Top Navbar
+   ============================================ */
+
+.mobile-navbar {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+    padding: 0.75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+}
+
+/* ============================================
+   Sidebar
+   ============================================ */
+
+.sidebar {
+    width: var(--sidebar-width);
+    min-height: 100vh;
+    background: var(--sidebar-bg);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1040;
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--transition-speed) ease;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-brand {
+    color: white;
+    text-decoration: none;
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.sidebar-brand i {
+    font-size: 1.5rem;
+}
+
+.sidebar-close {
+    display: none;
+}
+
+.sidebar-user {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-avatar i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    color: white;
+    font-weight: 600;
+}
+
+.user-status {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+}
+
+.user-status i {
+    font-size: 0.5rem;
+    margin-right: 0.25rem;
+}
+
+.sidebar-nav {
+    list-style: none;
+    padding: 1rem 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-nav .nav-item {
+    margin: 0.25rem 0.75rem;
+}
+
+.sidebar-nav .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all var(--transition-speed);
+}
+
+.sidebar-nav .nav-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    transform: translateX(5px);
+}
+
+.sidebar-nav .nav-link.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 600;
+}
+
+.sidebar-nav .nav-link i {
+    font-size: 1.25rem;
+    width: 24px;
+    text-align: center;
+}
+
+.sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================
+   Sidebar Overlay (Mobile)
+   ============================================ */
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1035;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-speed);
+}
+
+.sidebar-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ============================================
+   Main Content
+   ============================================ */
+
+.main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================
+   Dashboard Cards
+   ============================================ */
+
+.dashboard-card {
+    border: none;
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--card-shadow);
+    transition: all var(--transition-speed);
+    height: 100%;
+    overflow: hidden;
+}
+
+@media (hover: hover) {
+    .dashboard-card:hover {
+        box-shadow: var(--card-hover-shadow);
+        transform: translateY(-3px);
+    }
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--bs-border-color);
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-header i {
+    margin-right: 0.5rem;
+}
+
+.card-header .refresh-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all var(--transition-speed);
+    padding: 0.25rem;
+}
+
+.card-header .refresh-btn:hover {
+    opacity: 1;
+    transform: rotate(180deg);
+}
+
+/* ============================================
+   Weather Card
+   ============================================ */
+
+.weather-card {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    color: white;
+}
+
+.weather-card .card-header {
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.weather-icon {
+    font-size: 4rem;
+}
+
+.temperature {
+    font-size: 3.5rem;
+    font-weight: 700;
+}
+
+.forecast-day {
+    text-align: center;
+    padding: 0.5rem;
+}
+
+/* ============================================
+   Quote Card
+   ============================================ */
+
+.quote-card {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: white;
+}
+
+.quote-card .card-header {
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.quote-text {
+    font-size: 1.1rem;
+    font-style: italic;
+    line-height: 1.6;
+}
+
+.quote-author {
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+/* ============================================
+   Todo List
+   ============================================ */
+
+.todo-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--bs-border-color);
+    transition: all var(--transition-speed);
+}
+
+.todo-item:last-child {
+    border-bottom: none;
+}
+
+.todo-item.completed .todo-text {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.todo-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.75rem;
+    cursor: pointer;
+}
+
+.todo-text {
+    flex: 1;
+    transition: all var(--transition-speed);
+}
+
+.todo-delete {
+    opacity: 0;
+    transition: opacity var(--transition-speed);
+    background: none;
+    border: none;
+    color: var(--bs-danger);
+    cursor: pointer;
+}
+
+.todo-item:hover .todo-delete {
+    opacity: 1;
+}
+
+.add-todo-input {
+    border-radius: 10px;
+}
+
+/* ============================================
+   Schedule Card
+   ============================================ */
+
+.schedule-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.75rem 0;
+    border-left: 3px solid;
+    padding-left: 1rem;
+    margin-bottom: 0.75rem;
+    transition: all var(--transition-speed);
+}
+
+.schedule-item:hover {
+    transform: translateX(5px);
+}
+
+.schedule-time {
+    font-weight: 600;
+    font-size: 0.875rem;
+    min-width: 80px;
+}
+
+.schedule-title {
+    font-weight: 500;
+}
+
+.schedule-desc {
+    font-size: 0.875rem;
+    opacity: 0.7;
+}
+
+/* ============================================
+   Notes Card
+   ============================================ */
+
+.note-item {
+    padding: 1rem;
+    border-radius: 10px;
+    background: var(--bs-tertiary-bg);
+    margin-bottom: 0.75rem;
+    transition: all var(--transition-speed);
+    cursor: pointer;
+}
+
+.note-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow);
+}
+
+.note-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.note-content {
+    font-size: 0.875rem;
+    opacity: 0.8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.note-date {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    margin-top: 0.5rem;
+}
+
+/* ============================================
+   Chart Container
+   ============================================ */
+
+.chart-container {
+    position: relative;
+    height: 250px;
+    width: 100%;
+}
+
+/* ============================================
+   Calendar Styles
+   ============================================ */
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.calendar-header-cell {
+    text-align: center;
+    font-weight: 600;
+    padding: 0.75rem;
+    background: var(--bs-tertiary-bg);
+}
+
+.calendar-day {
+    min-height: 100px;
+    padding: 0.5rem;
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    position: relative;
+}
+
+.calendar-day:hover {
+    background: var(--bs-tertiary-bg);
+}
+
+.calendar-day.today {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-color: var(--gradient-start);
+}
+
+.calendar-day.today .day-number {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-day.other-month {
+    opacity: 0.4;
+}
+
+.day-number {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.day-events {
+    margin-top: 0.25rem;
+}
+
+.day-event {
+    font-size: 0.7rem;
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    margin-top: 0.125rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.day-event:hover {
+    opacity: 0.8;
+}
+
+/* ============================================
+   Pomodoro Timer
+   ============================================ */
+
+.pomodoro-container {
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.timer-circle {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 2rem auto;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+    position: relative;
+    transition: all var(--transition-speed);
+}
+
+.timer-circle.running {
+    animation: pulse-shadow 1s infinite;
+}
+
+.timer-circle.break {
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    box-shadow: 0 10px 40px rgba(17, 153, 142, 0.4);
+}
+
+.timer-circle.paused {
+    opacity: 0.7;
+}
+
+@keyframes pulse-shadow {
+
+    0%,
+    100% {
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 10px 60px rgba(102, 126, 234, 0.6);
+    }
+}
+
+.timer-display {
+    font-size: 4rem;
+    font-weight: 700;
+    color: white;
+}
+
+.timer-label {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 0.5rem;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.timer-btn {
+    padding: 0.75rem 2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all var(--transition-speed);
+}
+
+.timer-btn:hover {
+    transform: translateY(-3px);
+}
+
+.pomodoro-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.pomodoro-stat {
+    text-align: center;
+    padding: 1rem;
+    background: var(--bs-tertiary-bg);
+    border-radius: 10px;
+    min-width: 100px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    opacity: 0.7;
+}
+
+/* ============================================
+   Settings Page
+   ============================================ */
+
+.settings-section {
+    margin-bottom: 2rem;
+}
+
+.settings-section h5 {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--gradient-start);
+}
+
+.widget-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--bs-tertiary-bg);
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    transition: all var(--transition-speed);
+}
+
+.widget-toggle:hover {
+    background: var(--bs-secondary-bg);
+}
+
+.widget-toggle label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+
+.dashboard-footer {
+    padding: 1rem 0;
+    margin-top: auto;
+    border-top: 1px solid var(--bs-border-color);
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-10px);
+    }
+
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease forwards;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+.bounce {
+    animation: bounce 1s ease infinite;
+}
+
+/* Page header animation */
+.page-header {
+    animation: fadeIn 0.5s ease;
+}
+
+/* Card stagger animation */
+.dashboard-card {
+    animation: fadeIn 0.5s ease forwards;
+    opacity: 0;
+}
+
+.row .col-lg-4:nth-child(1) .dashboard-card,
+.row .col-md-6:nth-child(1) .dashboard-card {
+    animation-delay: 0.1s;
+}
+
+.row .col-lg-4:nth-child(2) .dashboard-card,
+.row .col-md-6:nth-child(2) .dashboard-card {
+    animation-delay: 0.2s;
+}
+
+.row .col-lg-4:nth-child(3) .dashboard-card,
+.row .col-md-6:nth-child(3) .dashboard-card {
+    animation-delay: 0.3s;
+}
+
+.row .col-lg-6:nth-child(1) .dashboard-card {
+    animation-delay: 0.1s;
+}
+
+.row .col-lg-6:nth-child(2) .dashboard-card {
+    animation-delay: 0.2s;
+}
+
+/* ============================================
+   Responsive Styles
+   ============================================ */
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .sidebar-close {
+        display: block;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .temperature {
+        font-size: 2.5rem;
+    }
+
+    .weather-icon {
+        font-size: 3rem;
+    }
+
+    .timer-circle {
+        width: 240px;
+        height: 240px;
+    }
+
+    .timer-display {
+        font-size: 3rem;
+    }
+
+    .calendar-day {
+        min-height: 80px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .dashboard-card {
+        margin-bottom: 1rem;
+    }
+
+    .quote-text {
+        font-size: 1rem;
+    }
+
+    .calendar-day {
+        min-height: 60px;
+        padding: 0.25rem;
+    }
+
+    .day-number {
+        font-size: 0.75rem;
+    }
+
+    .day-event {
+        font-size: 0.6rem;
+        padding: 0.1rem 0.25rem;
+    }
+
+    .pomodoro-stats {
+        gap: 1rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .timer-btn {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.875rem;
+    }
+
+    .pomodoro-stat {
+        min-width: 80px;
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .timer-circle {
+        width: 200px;
+        height: 200px;
+    }
+
+    .timer-display {
+        font-size: 2.5rem;
+    }
+
+    .timer-label {
+        font-size: 1rem;
+    }
+
+    .calendar-header-cell {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.65rem;
+    }
+
+    .calendar-day {
+        min-height: 50px;
+    }
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+}
+
+.btn-gradient {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    border: none;
+    color: white;
+}
+
+.btn-gradient:hover {
+    background: linear-gradient(135deg, var(--gradient-end), var(--gradient-start));
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Custom form styling */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--gradient-start);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: var(--gradient-start);
+    border-color: var(--gradient-start);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bs-tertiary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gradient-start);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gradient-end);
+}
+
+/* Modal styling */
+.modal-content {
+    border-radius: var(--card-border-radius);
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--bs-border-color);
+}

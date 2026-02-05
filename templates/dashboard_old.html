@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
+    <title>Personal Dashboard</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --card-border-radius: 16px;
+            --transition-speed: 0.3s;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bs-body-bg);
+            min-height: 100vh;
+            transition: background-color var(--transition-speed);
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Light mode specific */
+        [data-bs-theme="light"] {
+            --gradient-start: #667eea;
+            --gradient-end: #764ba2;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --card-hover-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        /* Dark mode specific */
+        [data-bs-theme="dark"] {
+            --gradient-start: #4c6ef5;
+            --gradient-end: #7950f2;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --card-hover-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+        }
+        
+        .dashboard-card {
+            border: none;
+            border-radius: var(--card-border-radius);
+            box-shadow: var(--card-shadow);
+            transition: all var(--transition-speed);
+            height: 100%;
+        }
+        
+        /* Disable hover effects on touch devices */
+        @media (hover: hover) {
+            .dashboard-card:hover {
+                box-shadow: var(--card-hover-shadow);
+                transform: translateY(-2px);
+            }
+        }
+        
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid var(--bs-border-color);
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+        }
+        
+        .card-header i {
+            margin-right: 0.5rem;
+        }
+        
+        /* Weather Card */
+        .weather-card {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+        }
+        
+        .weather-card .card-header {
+            border-bottom-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .weather-icon {
+            font-size: 4rem;
+        }
+        
+        .temperature {
+            font-size: 3.5rem;
+            font-weight: 700;
+        }
+        
+        .forecast-day {
+            text-align: center;
+            padding: 0.5rem;
+        }
+        
+        /* Quote Card */
+        .quote-card {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+        
+        .quote-card .card-header {
+            border-bottom-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .quote-text {
+            font-size: 1.25rem;
+            font-style: italic;
+            line-height: 1.6;
+        }
+        
+        .quote-author {
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1rem;
+            }
+            
+            .greeting {
+                font-size: 1.5rem !important;
+            }
+            
+            .temperature {
+                font-size: 2.5rem;
+            }
+            
+            .weather-icon {
+                font-size: 3rem;
+            }
+            
+            .quote-text {
+                font-size: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem !important;
+            }
+            
+            .card-header {
+                padding: 0.875rem 1rem;
+                font-size: 0.95rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .forecast-day {
+                padding: 0.25rem;
+                font-size: 0.85rem;
+            }
+            
+            .add-todo-input {
+                font-size: 16px; /* Prevents iOS zoom */
+            }
+            
+            .todo-delete {
+                opacity: 1; /* Always visible on mobile */
+            }
+            
+            .container {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            
+            .schedule-item {
+                flex-direction: column;
+            }
+            
+            .schedule-time {
+                margin-bottom: 0.25rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .row.g-4 {
+                --bs-gutter-y: 1rem;
+            }
+            
+            .dashboard-card {
+                border-radius: 12px;
+            }
+            
+            .navbar {
+                padding: 0.5rem 0;
+            }
+        }
+        
+        /* Todo List */
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--bs-border-color);
+            transition: all 0.2s;
+        }
+        
+        .todo-item:last-child {
+            border-bottom: none;
+        }
+        
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        
+        .todo-checkbox {
+            width: 22px;
+            height: 22px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+        
+        .todo-delete {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .todo-item:hover .todo-delete {
+            opacity: 1;
+        }
+        
+        /* Schedule */
+        .schedule-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 0.75rem 0;
+            border-left: 3px solid;
+            padding-left: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0 8px 8px 0;
+            background: var(--bs-tertiary-bg);
+        }
+        
+        .schedule-time {
+            font-weight: 600;
+            min-width: 80px;
+            color: var(--bs-secondary);
+        }
+        
+        .schedule-title {
+            font-weight: 500;
+        }
+        
+        .schedule-desc {
+            font-size: 0.875rem;
+            color: var(--bs-secondary);
+        }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Add Todo Input */
+        .add-todo-input {
+            border-radius: 25px;
+            padding: 0.75rem 1.25rem;
+        }
+        
+        .add-todo-btn {
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem;
+        }
+        
+        /* Greeting */
+        .greeting {
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+        
+        .date-display {
+            color: var(--bs-secondary);
+        }
+        
+        /* Stats */
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gradient-start);
+        }
+        
+        /* Refresh buttons */
+        .refresh-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            opacity: 1;
+            transform: rotate(180deg);
+        }
+        
+        /* Loading spinner */
+        .spinner-small {
+            width: 1rem;
+            height: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-grid-1x2-fill me-2"></i>My Dashboard
+            </a>
+            <div class="d-flex align-items-center">
+                <span class="text-white me-3 d-none d-md-inline">
+                    {{ current_date.strftime('%A, %B %d, %Y') }}
+                </span>
+                <div class="theme-toggle text-white" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="bi bi-moon-fill" id="theme-icon"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        <!-- Greeting Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="greeting" id="greeting">Good Morning! 👋</h1>
+                <p class="date-display">Here's your personal dashboard overview</p>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Grid -->
+        <div class="row g-4">
+            <!-- Weather Card -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card dashboard-card weather-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-cloud-sun"></i>Weather</span>
+                        <button class="refresh-btn text-white" onclick="refreshWeather()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <div class="temperature">{{ weather.temperature }}°</div>
+                                <div>{{ weather.condition }}</div>
+                                <div class="small opacity-75">
+                                    <i class="bi bi-geo-alt"></i> {{ weather.location }}
+                                </div>
+                            </div>
+                            <div class="weather-icon">
+                                <i class="bi bi-{{ weather.icon }}"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between small opacity-75 mb-3">
+                            <span><i class="bi bi-droplet"></i> {{ weather.humidity }}% Humidity</span>
+                            <span><i class="bi bi-wind"></i> {{ weather.wind }} km/h</span>
+                        </div>
+                        <hr class="opacity-25">
+                        <div class="d-flex justify-content-between">
+                            {% for day in weather.forecast %}
+                            <div class="forecast-day">
+                                <div class="small opacity-75">{{ day.day }}</div>
+                                <i class="bi bi-{{ day.icon }}"></i>
+                                <div class="small">{{ day.high }}°</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quote Card -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card dashboard-card quote-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-quote"></i>Daily Inspiration</span>
+                        <button class="refresh-btn text-white" onclick="refreshQuote()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <p class="quote-text mb-3" id="quote-text">"{{ quote.quote }}"</p>
+                        <p class="quote-author mb-0" id="quote-author">— {{ quote.author }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Card -->
+            <div class="col-lg-4 col-md-12">
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <i class="bi bi-bar-chart"></i>Today's Progress
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="stat-number" id="tasks-completed">
+                                    {{ todos|selectattr('completed')|list|length }}
+                                </div>
+                                <div class="small text-secondary">Completed</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-number" id="tasks-pending">
+                                    {{ todos|rejectattr('completed')|list|length }}
+                                </div>
+                                <div class="small text-secondary">Pending</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-number">{{ schedule|length }}</div>
+                                <div class="small text-secondary">Events</div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="mb-2 d-flex justify-content-between">
+                            <span>Task Completion</span>
+                            <span id="completion-percent">
+                                {% if todos|length > 0 %}
+                                    {{ ((todos|selectattr('completed')|list|length / todos|length) * 100)|int }}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" id="completion-bar" style="width: {% if todos|length > 0 %}{{ (todos|selectattr('completed')|list|length / todos|length) * 100 }}{% else %}0{% endif %}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Todo List Card -->
+            <div class="col-lg-6">
+                <div class="card dashboard-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-check2-square"></i>To-Do List</span>
+                        <span class="badge bg-primary rounded-pill" id="todo-count">{{ todos|length }}</span>
+                    </div>
+                    <div class="card-body">
+                        <!-- Add Todo Form -->
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control add-todo-input" id="new-todo" 
+                                   placeholder="Add a new task..." onkeypress="handleTodoKeypress(event)">
+                            <button class="btn btn-primary add-todo-btn" onclick="addTodo()">
+                                <i class="bi bi-plus-lg"></i> Add
+                            </button>
+                        </div>
+                        
+                        <!-- Todo List -->
+                        <div id="todo-list" style="max-height: 300px; overflow-y: auto;">
+                            {% for todo in todos %}
+                            <div class="todo-item {% if todo.completed %}completed{% endif %}" data-id="{{ todo.id }}">
+                                <input type="checkbox" class="form-check-input todo-checkbox" 
+                                       {% if todo.completed %}checked{% endif %}
+                                       onchange="toggleTodo({{ todo.id }}, this.checked)">
+                                <span class="todo-text flex-grow-1">{{ todo.task }}</span>
+                                <button class="btn btn-sm btn-outline-danger todo-delete" onclick="deleteTodo({{ todo.id }})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Card -->
+            <div class="col-lg-6">
+                <div class="card dashboard-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-calendar-event"></i>Today's Schedule</span>
+                        <span class="badge bg-success rounded-pill">{{ schedule|length }} events</span>
+                    </div>
+                    <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                        {% for item in schedule %}
+                        <div class="schedule-item border-{{ item.color }}">
+                            <div class="schedule-time">{{ item.time }}</div>
+                            <div>
+                                <div class="schedule-title">{{ item.title }}</div>
+                                {% if item.description %}
+                                <div class="schedule-desc">{{ item.description }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Theme Management
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            
+            if (html.getAttribute('data-bs-theme') === 'light') {
+                html.setAttribute('data-bs-theme', 'dark');
+                icon.className = 'bi bi-sun-fill';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                html.setAttribute('data-bs-theme', 'light');
+                icon.className = 'bi bi-moon-fill';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Load saved theme
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            
+            html.setAttribute('data-bs-theme', savedTheme);
+            icon.className = savedTheme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+        }
+        
+        // Greeting based on time
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            const greeting = document.getElementById('greeting');
+            let text = 'Good ';
+            
+            if (hour < 12) text += 'Morning! ☀️';
+            else if (hour < 17) text += 'Afternoon! 🌤️';
+            else if (hour < 21) text += 'Evening! 🌆';
+            else text += 'Night! 🌙';
+            
+            greeting.textContent = text;
+        }
+        
+        // Refresh Quote
+        async function refreshQuote() {
+            try {
+                const response = await fetch('/api/quote');
+                const data = await response.json();
+                document.getElementById('quote-text').textContent = `"${data.quote}"`;
+                document.getElementById('quote-author').textContent = `— ${data.author}`;
+            } catch (error) {
+                console.error('Error fetching quote:', error);
+            }
+        }
+        
+        // Refresh Weather (real API call)
+        async function refreshWeather() {
+            try {
+                const btn = document.querySelector('.weather-card .refresh-btn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i>';
+                
+                const response = await fetch('/api/weather');
+                const data = await response.json();
+                
+                // Update weather display
+                document.querySelector('.temperature').textContent = data.temperature + '°';
+                document.querySelector('.weather-card .card-body > div:first-child > div:nth-child(2)').textContent = data.condition;
+                document.querySelector('.weather-card .bi-geo-alt').parentElement.innerHTML = '<i class="bi bi-geo-alt"></i> ' + data.location;
+                document.querySelector('.weather-icon i').className = 'bi bi-' + data.icon;
+                
+                // Update humidity and wind
+                const stats = document.querySelectorAll('.weather-card .opacity-75.mb-3 span');
+                stats[0].innerHTML = '<i class="bi bi-droplet"></i> ' + data.humidity + '% Humidity';
+                stats[1].innerHTML = '<i class="bi bi-wind"></i> ' + data.wind + ' km/h';
+                
+                // Update forecast
+                const forecastDays = document.querySelectorAll('.forecast-day');
+                data.forecast.forEach((day, i) => {
+                    if (forecastDays[i]) {
+                        forecastDays[i].querySelector('.small.opacity-75').textContent = day.day;
+                        forecastDays[i].querySelector('i').className = 'bi bi-' + day.icon;
+                        forecastDays[i].querySelector('.small:last-child').textContent = day.high + '°';
+                    }
+                });
+                
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+            } catch (error) {
+                console.error('Error fetching weather:', error);
+                alert('Failed to refresh weather. Please try again.');
+            }
+        }
+        
+        // Todo Functions
+        async function addTodo() {
+            const input = document.getElementById('new-todo');
+            const task = input.value.trim();
+            
+            if (!task) return;
+            
+            try {
+                const response = await fetch('/api/todos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ task })
+                });
+                
+                if (response.ok) {
+                    const todo = await response.json();
+                    addTodoToDOM(todo);
+                    input.value = '';
+                    updateStats();
+                }
+            } catch (error) {
+                console.error('Error adding todo:', error);
+            }
+        }
+        
+        function addTodoToDOM(todo) {
+            const list = document.getElementById('todo-list');
+            const div = document.createElement('div');
+            div.className = 'todo-item';
+            div.setAttribute('data-id', todo.id);
+            div.innerHTML = `
+                <input type="checkbox" class="form-check-input todo-checkbox" 
+                       onchange="toggleTodo(${todo.id}, this.checked)">
+                <span class="todo-text flex-grow-1">${todo.task}</span>
+                <button class="btn btn-sm btn-outline-danger todo-delete" onclick="deleteTodo(${todo.id})">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+            list.insertBefore(div, list.firstChild);
+        }
+        
+        async function toggleTodo(id, completed) {
+            try {
+                await fetch(`/api/todos/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ completed })
+                });
+                
+                const item = document.querySelector(`.todo-item[data-id="${id}"]`);
+                if (completed) {
+                    item.classList.add('completed');
+                } else {
+                    item.classList.remove('completed');
+                }
+                updateStats();
+            } catch (error) {
+                console.error('Error updating todo:', error);
+            }
+        }
+        
+        async function deleteTodo(id) {
+            try {
+                await fetch(`/api/todos/${id}`, { method: 'DELETE' });
+                document.querySelector(`.todo-item[data-id="${id}"]`).remove();
+                updateStats();
+            } catch (error) {
+                console.error('Error deleting todo:', error);
+            }
+        }
+        
+        function handleTodoKeypress(event) {
+            if (event.key === 'Enter') {
+                addTodo();
+            }
+        }
+        
+        function updateStats() {
+            const items = document.querySelectorAll('.todo-item');
+            const completed = document.querySelectorAll('.todo-item.completed').length;
+            const total = items.length;
+            const pending = total - completed;
+            const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            document.getElementById('tasks-completed').textContent = completed;
+            document.getElementById('tasks-pending').textContent = pending;
+            document.getElementById('completion-percent').textContent = percent + '%';
+            document.getElementById('completion-bar').style.width = percent + '%';
+            document.getElementById('todo-count').textContent = total;
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            updateGreeting();
+        });
+    </script>
+</body>
+</html>

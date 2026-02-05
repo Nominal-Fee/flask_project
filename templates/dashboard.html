@@ -1,0 +1,468 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="h3 mb-1" id="greeting">Good day!</h1>
+            <p class="text-muted mb-0">{{ current_date.strftime('%A, %B %d, %Y') }}</p>
+        </div>
+        <div class="col-auto">
+            <span class="badge bg-gradient-primary fs-6 p-2">
+                <i class="bi bi-check-circle me-1"></i>
+                {{ completed_todos }}/{{ total_todos }} Tasks Done
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-list-check text-primary fs-1"></i>
+                <h3 class="mt-2 mb-0">{{ total_todos }}</h3>
+                <small class="text-muted">Total Tasks</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-check2-circle text-success fs-1"></i>
+                <h3 class="mt-2 mb-0">{{ completed_todos }}</h3>
+                <small class="text-muted">Completed</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-stopwatch text-info fs-1"></i>
+                <h3 class="mt-2 mb-0">{{ today_sessions }}</h3>
+                <small class="text-muted">Pomodoros Today</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-journal-text text-warning fs-1"></i>
+                <h3 class="mt-2 mb-0">{{ notes|length }}</h3>
+                <small class="text-muted">Notes</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Row -->
+<div class="row g-4">
+    <!-- Weather Card -->
+    <div class="col-lg-4 col-md-6" id="widget-weather">
+        <div class="card dashboard-card weather-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-cloud-sun"></i>Weather</span>
+                <button class="refresh-btn text-white" onclick="refreshWeather()" title="Refresh">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <div class="temperature" id="weather-temp">{{ weather.temperature }}°C</div>
+                        <div id="weather-condition">{{ weather.condition }}</div>
+                        <div class="small opacity-75">
+                            <i class="bi bi-geo-alt"></i> <span id="weather-location">{{ weather.location }}</span>
+                        </div>
+                    </div>
+                    <div class="weather-icon">
+                        <i class="bi bi-{{ weather.icon }}" id="weather-icon"></i>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between small opacity-75 mb-3">
+                    <span><i class="bi bi-droplet"></i> <span id="weather-humidity">{{ weather.humidity }}</span>% Humidity</span>
+                    <span><i class="bi bi-wind"></i> <span id="weather-wind">{{ weather.wind }}</span> km/h</span>
+                </div>
+                <hr class="opacity-25">
+                <div class="d-flex justify-content-between" id="weather-forecast">
+                    {% for day in weather.forecast %}
+                    <div class="forecast-day">
+                        <div class="small opacity-75">{{ day.day }}</div>
+                        <i class="bi bi-{{ day.icon }}"></i>
+                        <div class="small">{{ day.high }}°</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quote Card -->
+    <div class="col-lg-4 col-md-6" id="widget-quote">
+        <div class="card dashboard-card quote-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-quote"></i>Daily Inspiration</span>
+                <button class="refresh-btn text-white" onclick="refreshQuote()" title="New Quote">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <p class="quote-text mb-3" id="quote-text">"{{ quote.quote }}"</p>
+                <p class="quote-author mb-0" id="quote-author">— {{ quote.author }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Productivity Chart -->
+    <div class="col-lg-4 col-md-12" id="widget-chart">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <span><i class="bi bi-graph-up"></i>Weekly Productivity</span>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="productivityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Todo List -->
+    <div class="col-lg-6" id="widget-todos">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <span><i class="bi bi-check2-square"></i>To-Do List</span>
+                <a href="#" class="text-decoration-none small" data-bs-toggle="modal" data-bs-target="#allTodosModal">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control add-todo-input" id="new-todo" placeholder="Add a new task...">
+                    <button class="btn btn-gradient" onclick="addTodo()">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                </div>
+                <div id="todo-list">
+                    {% for todo in todos %}
+                    <div class="todo-item {% if todo.completed %}completed{% endif %}" data-id="{{ todo.id }}">
+                        <input type="checkbox" class="form-check-input todo-checkbox" 
+                               {% if todo.completed %}checked{% endif %}
+                               onchange="toggleTodo({{ todo.id }}, this.checked)">
+                        <span class="todo-text">{{ todo.task }}</span>
+                        <button class="todo-delete" onclick="deleteTodo({{ todo.id }})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule -->
+    <div class="col-lg-6" id="widget-schedule">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <span><i class="bi bi-calendar-event"></i>Today's Schedule</span>
+            </div>
+            <div class="card-body" style="max-height: 350px; overflow-y: auto;">
+                {% for item in schedule %}
+                <div class="schedule-item border-{{ item.color }}">
+                    <div>
+                        <div class="schedule-time text-{{ item.color }}">{{ item.time }}</div>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="schedule-title">{{ item.title }}</div>
+                        {% if item.description %}
+                        <div class="schedule-desc">{{ item.description }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Preview -->
+    <div class="col-lg-6" id="widget-notes">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <span><i class="bi bi-sticky"></i>Recent Notes</span>
+                <a href="/notes" class="text-decoration-none small">View All</a>
+            </div>
+            <div class="card-body">
+                {% if notes %}
+                    {% for note in notes %}
+                    <div class="note-item" onclick="window.location.href='/notes'">
+                        <div class="note-title">
+                            <span class="badge bg-{{ note.color }} me-2">●</span>
+                            {{ note.title }}
+                        </div>
+                        <div class="note-content">{{ note.content }}</div>
+                        <div class="note-date">{{ note.updated_at.strftime('%b %d, %Y') if note.updated_at else '' }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center my-4">
+                        <i class="bi bi-journal-plus fs-1 d-block mb-2"></i>
+                        No notes yet. <a href="/notes">Create one!</a>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="col-lg-6" id="widget-quick-links">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <span><i class="bi bi-lightning"></i>Quick Actions</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <a href="/pomodoro" class="btn btn-outline-primary w-100 py-3">
+                            <i class="bi bi-stopwatch fs-4 d-block mb-1"></i>
+                            Start Pomodoro
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="/calendar" class="btn btn-outline-success w-100 py-3">
+                            <i class="bi bi-calendar-plus fs-4 d-block mb-1"></i>
+                            Add Event
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="/notes" class="btn btn-outline-warning w-100 py-3">
+                            <i class="bi bi-journal-plus fs-4 d-block mb-1"></i>
+                            New Note
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="/settings" class="btn btn-outline-secondary w-100 py-3">
+                            <i class="bi bi-gear fs-4 d-block mb-1"></i>
+                            Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- All Todos Modal -->
+<div class="modal fade" id="allTodosModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-list-check me-2"></i>All Tasks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="all-todos-list">
+                <!-- Loaded via JS -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Greeting based on time
+    function updateGreeting() {
+        const hour = new Date().getHours();
+        const userName = localStorage.getItem('userName') || 'User';
+        let text = '';
+        
+        if (hour < 12) text = `Good morning, ${userName}! ☀️`;
+        else if (hour < 17) text = `Good afternoon, ${userName}! 🌤️`;
+        else if (hour < 21) text = `Good evening, ${userName}! 🌆`;
+        else text = `Good night, ${userName}! 🌙`;
+        
+        document.getElementById('greeting').textContent = text;
+    }
+    updateGreeting();
+
+    // Initialize productivity chart
+    const weeklyData = {{ weekly_data | tojson }};
+    const ctx = document.getElementById('productivityChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: weeklyData.map(d => d.day),
+            datasets: [{
+                label: 'Pomodoro Sessions',
+                data: weeklyData.map(d => d.sessions),
+                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 1,
+                borderRadius: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+
+    // Refresh Quote
+    async function refreshQuote() {
+        try {
+            const response = await fetch('/api/quote');
+            const data = await response.json();
+            document.getElementById('quote-text').textContent = `"${data.quote}"`;
+            document.getElementById('quote-author').textContent = `— ${data.author}`;
+        } catch (error) {
+            console.error('Error fetching quote:', error);
+        }
+    }
+
+    // Refresh Weather
+    async function refreshWeather() {
+        try {
+            const btn = document.querySelector('.weather-card .refresh-btn');
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i>';
+            
+            const response = await fetch('/api/weather');
+            const data = await response.json();
+            
+            document.getElementById('weather-temp').textContent = data.temperature + '°C';
+            document.getElementById('weather-condition').textContent = data.condition;
+            document.getElementById('weather-location').textContent = data.location;
+            document.getElementById('weather-icon').className = 'bi bi-' + data.icon;
+            document.getElementById('weather-humidity').textContent = data.humidity;
+            document.getElementById('weather-wind').textContent = data.wind;
+            
+            const forecastHtml = data.forecast.map(day => `
+                <div class="forecast-day">
+                    <div class="small opacity-75">${day.day}</div>
+                    <i class="bi bi-${day.icon}"></i>
+                    <div class="small">${day.high}°</div>
+                </div>
+            `).join('');
+            document.getElementById('weather-forecast').innerHTML = forecastHtml;
+            
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+        } catch (error) {
+            console.error('Error fetching weather:', error);
+        }
+    }
+
+    // Todo Functions
+    async function addTodo() {
+        const input = document.getElementById('new-todo');
+        const task = input.value.trim();
+        
+        if (!task) return;
+        
+        try {
+            const response = await fetch('/api/todos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ task })
+            });
+            
+            if (response.ok) {
+                const todo = await response.json();
+                addTodoToDOM(todo);
+                input.value = '';
+            }
+        } catch (error) {
+            console.error('Error adding todo:', error);
+        }
+    }
+
+    function addTodoToDOM(todo) {
+        const list = document.getElementById('todo-list');
+        const div = document.createElement('div');
+        div.className = 'todo-item fade-in';
+        div.dataset.id = todo.id;
+        div.innerHTML = `
+            <input type="checkbox" class="form-check-input todo-checkbox" 
+                   onchange="toggleTodo(${todo.id}, this.checked)">
+            <span class="todo-text">${todo.task}</span>
+            <button class="todo-delete" onclick="deleteTodo(${todo.id})">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+        list.insertBefore(div, list.firstChild);
+    }
+
+    async function toggleTodo(id, completed) {
+        try {
+            await fetch(`/api/todos/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ completed })
+            });
+            
+            const item = document.querySelector(`.todo-item[data-id="${id}"]`);
+            if (completed) {
+                item.classList.add('completed');
+            } else {
+                item.classList.remove('completed');
+            }
+        } catch (error) {
+            console.error('Error updating todo:', error);
+        }
+    }
+
+    async function deleteTodo(id) {
+        try {
+            await fetch(`/api/todos/${id}`, { method: 'DELETE' });
+            const item = document.querySelector(`.todo-item[data-id="${id}"]`);
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(20px)';
+            setTimeout(() => item.remove(), 300);
+        } catch (error) {
+            console.error('Error deleting todo:', error);
+        }
+    }
+
+    // Enter key for todo input
+    document.getElementById('new-todo').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') addTodo();
+    });
+
+    // Load all todos in modal
+    document.getElementById('allTodosModal').addEventListener('show.bs.modal', async function() {
+        const response = await fetch('/api/todos');
+        const todos = await response.json();
+        
+        document.getElementById('all-todos-list').innerHTML = todos.map(todo => `
+            <div class="todo-item ${todo.completed ? 'completed' : ''}" data-id="${todo.id}">
+                <input type="checkbox" class="form-check-input todo-checkbox" 
+                       ${todo.completed ? 'checked' : ''}
+                       onchange="toggleTodo(${todo.id}, this.checked)">
+                <span class="todo-text">${todo.task}</span>
+                <button class="todo-delete" onclick="deleteTodo(${todo.id})" style="opacity: 1;">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `).join('');
+    });
+
+    // Apply widget visibility from settings
+    function applyWidgetSettings() {
+        const widgets = ['weather', 'quote', 'chart', 'todos', 'schedule', 'notes', 'quick-links'];
+        widgets.forEach(widget => {
+            const visible = localStorage.getItem(`widget-${widget}`) !== 'false';
+            const el = document.getElementById(`widget-${widget}`);
+            if (el) el.style.display = visible ? '' : 'none';
+        });
+    }
+    applyWidgetSettings();
+</script>
+{% endblock %}

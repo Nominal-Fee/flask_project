@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
+    <title>{% block title %}Dashboard{% endblock %} | Personal Dashboard</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Mobile Top Navbar (visible on small screens) -->
+    <nav class="navbar navbar-expand-lg mobile-navbar d-lg-none">
+        <div class="container-fluid">
+            <button class="btn btn-link text-white p-0 me-3" id="mobileMenuToggle">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+            <a class="navbar-brand text-white" href="/">
+                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+            </a>
+            <div class="ms-auto d-flex align-items-center">
+                <button class="btn btn-link text-white p-0" id="mobileThemeToggle">
+                    <i class="bi bi-moon-fill"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay d-lg-none" id="sidebarOverlay"></div>
+
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="sidebar-brand">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <button class="btn btn-link text-white d-lg-none sidebar-close" id="sidebarClose">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            
+            <div class="sidebar-user">
+                <div class="user-avatar">
+                    <i class="bi bi-person-circle"></i>
+                </div>
+                <div class="user-info">
+                    <span class="user-name" id="userName">User</span>
+                    <span class="user-status"><i class="bi bi-circle-fill text-success"></i> Online</span>
+                </div>
+            </div>
+
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a href="/" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                        <i class="bi bi-house-door"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/calendar" class="nav-link {% if request.endpoint == 'calendar' %}active{% endif %}">
+                        <i class="bi bi-calendar3"></i>
+                        <span>Calendar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/pomodoro" class="nav-link {% if request.endpoint == 'pomodoro' %}active{% endif %}">
+                        <i class="bi bi-stopwatch"></i>
+                        <span>Pomodoro Timer</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/notes" class="nav-link {% if request.endpoint == 'notes_page' %}active{% endif %}">
+                        <i class="bi bi-journal-text"></i>
+                        <span>Notes</span>
+                    </a>
+                </li>
+                <li class="nav-item mt-auto">
+                    <a href="/settings" class="nav-link {% if request.endpoint == 'settings' %}active{% endif %}">
+                        <i class="bi bi-gear"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-outline-light btn-sm w-100" id="themeToggle">
+                    <i class="bi bi-moon-fill me-2"></i>
+                    <span>Dark Mode</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container-fluid py-4">
+                {% block content %}{% endblock %}
+            </div>
+
+            <!-- Footer -->
+            <footer class="dashboard-footer">
+                <div class="container-fluid">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 text-center text-md-start">
+                            <span class="text-muted">© 2026 Personal Dashboard. Built with Flask & Bootstrap.</span>
+                        </div>
+                        <div class="col-md-6 text-center text-md-end">
+                            <span class="text-muted" id="currentDateTime"></span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Base JavaScript -->
+    <script>
+        // Initialize theme from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            updateThemeButton(savedTheme);
+            
+            // Load username
+            const savedName = localStorage.getItem('userName') || 'User';
+            document.getElementById('userName').textContent = savedName;
+            
+            // Update date/time
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+        });
+
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        function updateThemeButton(theme) {
+            const themeToggle = document.getElementById('themeToggle');
+            const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+            if (theme === 'dark') {
+                themeToggle.innerHTML = '<i class="bi bi-sun-fill me-2"></i><span>Light Mode</span>';
+                if (mobileThemeToggle) mobileThemeToggle.innerHTML = '<i class="bi bi-sun-fill"></i>';
+            } else {
+                themeToggle.innerHTML = '<i class="bi bi-moon-fill me-2"></i><span>Dark Mode</span>';
+                if (mobileThemeToggle) mobileThemeToggle.innerHTML = '<i class="bi bi-moon-fill"></i>';
+            }
+        }
+
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        document.getElementById('mobileThemeToggle')?.addEventListener('click', toggleTheme);
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(newTheme);
+        }
+
+        // Mobile sidebar toggle
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarClose = document.getElementById('sidebarClose');
+
+        mobileMenuToggle?.addEventListener('click', () => {
+            sidebar.classList.add('show');
+            sidebarOverlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        });
+
+        function closeSidebar() {
+            sidebar.classList.remove('show');
+            sidebarOverlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        sidebarOverlay?.addEventListener('click', closeSidebar);
+        sidebarClose?.addEventListener('click', closeSidebar);
+
+        // Close sidebar when clicking a link on mobile
+        document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 992) {
+                    closeSidebar();
+                }
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
