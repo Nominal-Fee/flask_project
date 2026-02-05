@@ -136,7 +136,12 @@
         <div class="card dashboard-card">
             <div class="card-header">
                 <span><i class="bi bi-check2-square"></i>To-Do List</span>
-                <a href="#" class="text-decoration-none small" data-bs-toggle="modal" data-bs-target="#allTodosModal">View All</a>
+                <div>
+                    <a href="/export/todos/csv" class="text-decoration-none small me-2" title="Export to CSV">
+                        <i class="bi bi-download"></i>
+                    </a>
+                    <a href="#" class="text-decoration-none small" data-bs-toggle="modal" data-bs-target="#allTodosModal">View All</a>
+                </div>
             </div>
             <div class="card-body">
                 <div class="input-group mb-3">
@@ -191,7 +196,12 @@
         <div class="card dashboard-card">
             <div class="card-header">
                 <span><i class="bi bi-sticky"></i>Recent Notes</span>
-                <a href="/notes" class="text-decoration-none small">View All</a>
+                <div>
+                    <a href="/export/notes/csv" class="text-decoration-none small me-2" title="Export to CSV">
+                        <i class="bi bi-download"></i>
+                    </a>
+                    <a href="/notes" class="text-decoration-none small">View All</a>
+                </div>
             </div>
             <div class="card-body">
                 {% if notes %}

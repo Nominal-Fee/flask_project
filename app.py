@@ -3,12 +3,14 @@ Personal Dashboard - Flask Application
 A modern, self-contained dashboard with weather, to-do list, notes, calendar,
 pomodoro timer, and productivity tracking.
 """
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_file, make_response
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from datetime import datetime, timedelta
 import random
 import calendar
+import csv
+import io
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -594,6 +596,77 @@ def health_check():
         'message': 'Dashboard is running!',
         'timestamp': datetime.now().isoformat()
     })
+
+
+# ============================================
+# Export Routes
+# ============================================
+
+@app.route('/export/todos/csv')
+def export_todos_csv():
+    """Export todos to CSV file."""
+    todos = Todo.query.order_by(Todo.created_at.desc()).all()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['ID', 'Task', 'Status', 'Created At'])
+    for todo in todos:
+        writer.writerow([
+            todo.id,
+            todo.task,
+            'Completed' if todo.completed else 'Pending',
+            todo.created_at.strftime('%Y-%m-%d %H:%M:%S') if todo.created_at else 'N/A'
+        ])
+    output.seek(0)
+    response = make_response(output.getvalue())
+    response.headers['Content-Type'] = 'text/csv'
+    response.headers['Content-Disposition'] = f'attachment; filename=todos_{datetime.now().strftime("%Y%m%d")}.csv'
+    return response
+
+
+@app.route('/export/notes/csv')
+def export_notes_csv():
+    """Export notes to CSV file."""
+    notes = Note.query.order_by(Note.updated_at.desc()).all()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['ID', 'Title', 'Content', 'Color', 'Created At', 'Updated At'])
+    for note in notes:
+        writer.writerow([
+            note.id,
+            note.title,
+            note.content.replace('\n', ' ').replace('\r', ' ') if note.content else '',
+            note.color,
+            note.created_at.strftime('%Y-%m-%d %H:%M:%S') if note.created_at else 'N/A',
+            note.updated_at.strftime('%Y-%m-%d %H:%M:%S') if note.updated_at else 'N/A'
+        ])
+    output.seek(0)
+    response = make_response(output.getvalue())
+    response.headers['Content-Type'] = 'text/csv'
+    response.headers['Content-Disposition'] = f'attachment; filename=notes_{datetime.now().strftime("%Y%m%d")}.csv'
+    return response
+
+
+@app.route('/export/calendar/csv')
+def export_calendar_csv():
+    """Export calendar events to CSV file."""
+    events = Event.query.order_by(Event.date, Event.time).all()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['ID', 'Title', 'Description', 'Date', 'Time', 'Color'])
+    for event in events:
+        writer.writerow([
+            event.id,
+            event.title,
+            event.description.replace('\n', ' ').replace('\r', ' ') if event.description else '',
+            event.date.strftime('%Y-%m-%d') if event.date else 'N/A',
+            event.time,
+            event.color
+        ])
+    output.seek(0)
+    response = make_response(output.getvalue())
+    response.headers['Content-Type'] = 'text/csv'
+    response.headers['Content-Disposition'] = f'attachment; filename=events_{datetime.now().strftime("%Y%m%d")}.csv'
+    return response
 
 
 # ============================================
