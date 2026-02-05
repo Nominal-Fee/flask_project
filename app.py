@@ -352,6 +352,12 @@ def notes_page():
     return render_template('notes.html', notes=notes)
 
 
+@app.route('/about')
+def about():
+    """About page."""
+    return render_template('about.html')
+
+
 @app.route('/settings')
 def settings():
     """Settings page."""
